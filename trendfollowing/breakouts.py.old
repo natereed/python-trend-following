@@ -1,0 +1,11 @@
+from indicators import n_day_highs, n_day_lows
+
+__author__ = 'nate'
+
+def is_new_high(prices, i, n):
+    highs = n_day_highs(prices, n)
+    return prices[i] > highs[i]
+
+def is_new_low(prices, i, n):
+    lows = n_day_lows(prices, n)
+    return prices[i] < lows[i]
