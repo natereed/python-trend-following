@@ -1,6 +1,7 @@
 __author__ = 'nate'
 
 import numpy as np
+from numpy import ma
 from trendfollowing.arrayutils import maskarray
 from trendfollowing.timeseries import TimeSeries
 
@@ -35,23 +36,23 @@ def apply_extrema_function_to_timeseries(timeseries, extrema_func, x_entry_name,
     for tdata_input in timeseries:
         prices.append(tdata_input[x_entry_name])
 
+    print "Applying extrema to " + str(prices)
+    print "y_entry_name: %s " % y_entry_name
+
     extrema = apply_extrema_function(extrema_func, prices, n)
     
-    out_data = []
-    index = min(n, len(timeseries))
+    print "Extrema: " + str(extrema)
 
-    for i in range(0, index):
-        tdata_input = timeseries[i]
-        tdata_output = tdata_input.copy()
-        tdata_output[y_entry_name] = None
-        out_data.append(tdata_output)
+    def mask_n_days_fn(data):
+        for i in range(0, min(n, len(data))):
+            data.mask[i][y_entry_name]=True
+
+    return timeseries.with_new_field(y_entry_name, extrema, mask_fn=mask_n_days_fn);
+        
+#    masked_array = ma.array(np.zeros(len(timeseries))
+                            #, mask=[i<n for i in range(len(timeseries))])
+                            #    return timeseries.with_new_field(y_entry_name, extrema, masked_array)
     
-    for i in range(index, len(timeseries)):
-        tdata_input = timeseries[i]
-        tdata_output = tdata_input.copy()
-        tdata_output[y_entry_name] = extrema[i]
-        out_data.append(tdata_output)
-
-    return TimeSeries(out_data)
+ #   return extrema
 
 

@@ -1,4 +1,4 @@
-from trendfollowing.extrema import n_day_highs_for_time_series
+from trendfollowing.extrema import n_day_highs_for_time_series, n_day_lows_for_time_series
 
 class Breakout:
     def __init__(self, date, price, period):
@@ -8,7 +8,6 @@ class Breakout:
 
 class NewHigh(Breakout):
     def __init__(self, date, price, period):
-        #super(NewHigh, date, price, period)
         Breakout.__init__(self, date, price, period)
 
 class NewLow(Breakout):
@@ -20,8 +19,6 @@ def get_new_highs(ts, period):
 
     new_highs = []
     for highs in highs_timeseries:
-        # print "price for %s: %f" % (highs['date'], highs['adj_close'])    
-        # print "previous high: %f" % (highs[str(period) + '_period_high_adj_close'])
         prev_high = highs[str(period) + '_period_high_adj_close']
         if (prev_high and highs['adj_close'] > prev_high):
             new_highs.append(NewHigh(highs['date'], highs['adj_close'], period))
@@ -29,7 +26,16 @@ def get_new_highs(ts, period):
     return new_highs
 
 def get_new_lows(ts, period):
-    return [NewLow(t.date, t['adj_close'], period) for t in ts if t['adj_close'] < n_day_low(ts, t.date, period)]    
+    lows_timeseries = n_day_lows_for_time_series(ts, period, 'adj_close')
+
+    new_lows = []
+    for lows in lows_timeseries:
+        prev_low = lows[str(period) + '_period_low_adj_close']
+        if (prev_low and lows['adj_close'] < prev_low):
+            new_lows.append(NewLow(lows['date'], lows['adj_close'], period))
+
+    return new_lows
+
 
 
     
